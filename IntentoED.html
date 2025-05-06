@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Picas y Fijas - Nivel Bucaramanga</title>
+  <link rel="icon" href="imagen2.png" type="image/png"> 
+  <style>
+    body {
+      background-image: url('imagen1.PNG');
+      background-size: cover;
+      background-position: center;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .contenedor {
+      background-color: rgba(0, 0, 0, 0.7);
+      margin: 0 auto;
+      padding: 40px;
+      width: 70%;
+      max-width: 1000px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px #fff;
+    }
+
+    img.logo {
+      width: 300px;
+      margin-bottom: 40px;
+    }
+
+    input[type="text"] {
+      font-size: 36px;
+      padding: 15px;
+      width: 200px;
+      border-radius: 5px;
+      border: none;
+      margin: 20px;
+      text-align: center;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 36px;
+      margin: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-pdf {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .btn-intentar {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .historial {
+      margin-top: 40px;
+      font-size: 36px;
+      text-align: left;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .pdf-container {
+      margin-top: 40px;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+
+    .text-explanation {
+      width: 35%;
+      font-size: 36px;
+      margin-left: 20px;
+      color: white;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <img src="imagen2.png" alt="Logo" class="logo" />
+    <h2 style="font-size: 36px;">🎯 Picas y Fijas - Nivel Bucaramanga</h2>
+    <p id="poblacion" style="font-size: 36px;"></p>
+    <p style="font-size: 36px;">¿En qué año se alcanzará esa población? (Entre 2010 y 2070)</p>
+    <p style="font-size: 36px;">❤️ Vidas: <span id="vidas">10</span></p>
+    <input type="text" id="inputAño" maxlength="4" placeholder="Año" />
+    <button class="btn-intentar" onclick="verificarIntento()">Intentar</button>
+    <div id="mensaje" style="font-size: 36px;"></div>
+    <div class="historial" id="historial"></div>
+    <br />
+
+    <div class="pdf-container">
+      <iframe id="pdfViewer" src="proyecto ecuaciones corte 1.pdf"></iframe>
+      <div id="pdfExplanation" class="text-explanation">Texto explicativo para el PDF 1.</div>
+    </div>
+    <button class="btn-pdf" onclick="togglePDF()">Cambiar PDF</button>
+  </div>
+
+  <script>
+    let currentPDF = 1;
+
+    function togglePDF() {
+      const pdfViewer = document.getElementById("pdfViewer");
+      const pdfExplanation = document.getElementById("pdfExplanation");
+      if (currentPDF === 1) {
+        pdfViewer.src = "ProyectoED_corte2of.pdf";
+        pdfExplanation.textContent = "Texto explicativo para el PDF 2.";
+        currentPDF = 2;
+      } else {
+        pdfViewer.src = "proyecto ecuaciones corte 1.pdf";
+        pdfExplanation.textContent = "Texto explicativo para el PDF 1.";
+        currentPDF = 1;
+      }
+    }
+
+    function poblacion(t) {
+      return 2000000 / (3.0444 * Math.exp(-0.059 * t) + 1);
+    }
+
+    function añoAT(año) {
+      return (año - 2010) * 0.5;
+    }
+
+    function contarFijasPicas(secreto, intento) {
+      let fijas = 0, picas = 0;
+      let usadasSecreto = [false, false, false, false];
+      let usadasIntento = [false, false, false, false];
+
+      for (let i = 0; i < 4; i++) {
+        if (intento[i] === secreto[i]) {
+          fijas++;
+          usadasSecreto[i] = true;
+          usadasIntento[i] = true;
+        }
+      }
+
+      for (let i = 0; i < 4; i++) {
+        if (!usadasIntento[i]) {
+          for (let j = 0; j < 4; j++) {
+            if (!usadasSecreto[j] && intento[i] === secreto[j]) {
+              picas++;
+              usadasSecreto[j] = true;
+              break;
+            }
+          }
+        }
+      }
+      return [fijas, picas];
+    }
+
+    let añoSecreto = Math.floor(Math.random() * (2070 - 2010 + 1)) + 2010;
+    let tSecreto = añoAT(añoSecreto);
+    let poblacionSecreta = Math.floor(poblacion(tSecreto));
+    let vidas = 10;
+    let intentos = 0;
+    let historial = [];
+    let pistaDada = false;
+    let juegoTerminado = false;
+
+    document.getElementById("poblacion").textContent = `La población proyectada es: ${poblacionSecreta} habitantes`;
+
+    function verificarIntento() {
+      if (juegoTerminado) return;
+
+      const input = document.getElementById("inputAño");
+      const año = input.value.trim();
+      const mensaje = document.getElementById("mensaje");
+
+      if (!/^\d{4}$/.test(año)) {
+        mensaje.textContent = "😅 Ups... ¿no sabes que un año tiene 4 dígitos? Pierdes 2 vidas.";
+        vidas -= 2;
+      } else {
+        const añoNum = parseInt(año);
+        if (añoNum < 2010 || añoNum > 2070) {
+          mensaje.textContent = "⚠️ El año debe estar entre 2010 y 2070. Pierdes 1 vida.";
+          vidas--;
+        } else {
+          const [fijas, picas] = contarFijasPicas(añoSecreto.toString(), año);
+          intentos++;
+          vidas--;
+          historial.push({ intento: año, fijas, picas });
+
+          const h = document.getElementById("historial");
+          const entrada = document.createElement("div");
+          entrada.textContent = `Intento ${intentos}: ${año} → 🔢 Fijas: ${fijas}, Picas: ${picas}`;
+          h.appendChild(entrada);
+
+          mensaje.textContent = `🔢 Fijas: ${fijas} | Picas: ${picas}`;
+
+          if (fijas === 4) {
+            juegoTerminado = true;
+            if (intentos === 1) {
+              mensaje.textContent += "\n🎉 ¡Eres un genio, tienes un IQ de 1000!";
+            } else if (intentos <= 5) {
+              mensaje.textContent += "\n🎉 ¡Felicidades crack! ¡Lo resolviste muy rápido!";
+            } else {
+              mensaje.textContent += `\n🎉 ¡Bien hecho! Adivinaste el año correctamente en ${intentos} intentos.`;
+            }
+          } else if (vidas < 5 && !pistaDada) {
+            for (let i = 0; i < 4; i++) {
+              const digito = añoSecreto.toString()[i];
+              if (!historial.some(h => h.intento.includes(digito))) {
+                mensaje.textContent += `\n💡 Modo fácil activado: el año contiene el dígito '${digito}'`;
+                pistaDada = true;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      if (vidas <= 0 && !juegoTerminado) {
+        juegoTerminado = true;
+        mensaje.textContent = `💀 Te quedaste sin vidas. Has perdido.\n📅 El año correcto era: ${añoSecreto}`;
+        for (let i = 0; i < 4; i++) {
+          const digito = añoSecreto.toString()[i];
+          if (!historial.some(h => h.intento.includes(digito))) {
+            mensaje.textContent += `\n💡 Una pista que te habría ayudado: el año contenía el dígito '${digito}'`;
+            break;
+          }
+        }
+        mensaje.textContent += "\n💬 ¡No te preocupes! Hasta los mejores fallan a veces. ¡Sigue practicando! 💪";
+      }
+
+      document.getElementById("vidas").textContent = vidas;
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
