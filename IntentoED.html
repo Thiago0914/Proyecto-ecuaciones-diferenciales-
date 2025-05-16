@@ -7,18 +7,43 @@
   <link rel="icon" href="imagen2.png" type="image/png"> 
   <style>
     body {
+      margin: 0;
+      padding: 0;
       background-image: url('imagen1.PNG');
       background-size: cover;
       background-position: center;
       font-family: 'Segoe UI', sans-serif;
       color: white;
       text-align: center;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      padding: 20px 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 30px;
       margin: 0;
-      padding: 0;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 25px;
+      text-decoration: none;
+      font-size: 22px;
     }
 
     .contenedor {
-      background-color: rgba(0, 0, 0, 0.7);
+      margin-top: 100px;
+      background-color: rgba(126, 255, 226, 0.7);
       margin: 0 auto;
       padding: 40px;
       width: 70%;
@@ -44,26 +69,21 @@
 
     button {
       padding: 15px 30px;
-      font-size: 36px;
-      margin: 20px;
+      font-size: 24px;
+      margin: 10px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
 
-    .btn-pdf {
-      background-color: #ffc107;
-      color: black;
-    }
-
-    .btn-intentar {
-      background-color: #28a745;
-      color: white;
-    }
+    .btn-pdf { background-color: #ffc107; color: black; }
+    .btn-intentar { background-color: #28a745; color: white; }
+    .btn-explicacion { background-color: #17a2b8; color: white; }
+    .btn-reiniciar { background-color: #dc3545; color: white; }
 
     .historial {
       margin-top: 40px;
-      font-size: 36px;
+      font-size: 24px;
       text-align: left;
       max-height: 300px;
       overflow-y: auto;
@@ -74,9 +94,16 @@
       border: 2px solid #fff;
       border-radius: 10px;
       padding: 20px;
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(155, 155, 155, 0.1);
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .pdf-header {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: white;
     }
 
     iframe {
@@ -87,49 +114,135 @@
 
     .text-explanation {
       width: 35%;
-      font-size: 36px;
+      font-size: 24px;
       margin-left: 20px;
       color: white;
       text-align: left;
     }
+
+    footer {
+      background-color: rgba(0, 0, 0, 0.85);
+      color: #ccc;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .manipulable-text {
+      margin-top: 20px;
+      font-size: 20px;
+      color: white;
+    }
+
+    .popup, .survey {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+      display: none; /* Oculto por defecto */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2000;
+    }
+
+    .popup h2, .survey h2 {
+      margin: 0 0 10px 0;
+      font-size: 24px;
+    }
+
+    .popup button, .survey button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .survey input {
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
-  <div class="contenedor">
+
+  <header>
+    <h1>PICAS Y FIJAS</h1>
+    <nav>
+      <a href="#inicio">Jugar</a>
+      <a href="#pdfs">PDFs</a>
+      <a href="#graficas">Gráficas</a>
+    </nav>
+  </header>
+
+  <div class="contenedor" id="inicio">
     <img src="imagen2.png" alt="Logo" class="logo" />
     <h2 style="font-size: 36px;">🎯 Picas y Fijas - Nivel Bucaramanga</h2>
     <p id="poblacion" style="font-size: 36px;"></p>
     <p style="font-size: 36px;">¿En qué año se alcanzará esa población? (Entre 2010 y 2070)</p>
     <p style="font-size: 36px;">❤️ Vidas: <span id="vidas">10</span></p>
     <input type="text" id="inputAño" maxlength="4" placeholder="Año" />
-    <button class="btn-intentar" onclick="verificarIntento()">Intentar</button>
-    <div id="mensaje" style="font-size: 36px;"></div>
-    <div class="historial" id="historial"></div>
-    <br />
+    
+    <div class="btn-group">
+      <button class="btn-intentar" onclick="verificarIntento()">Intentar</button>
+      <button class="btn-explicacion" onclick="mostrarExplicacion()">¿Cómo se juega?</button>
+      <button class="btn-reiniciar" onclick="reiniciarJuego()">Reiniciar</button>
+    </div>
 
-    <div class="pdf-container">
+    <div id="mensaje" style="font-size: 28px; white-space: pre-line;"></div>
+    <div class="historial" id="historial"></div>
+
+    <div class="pdf-container" id="pdfs">
+      <div class="pdf-header" id="pdfHeader">Proyecto ecuaciones diferenciales - Parte 1</div>
       <iframe id="pdfViewer" src="proyecto ecuaciones corte 1.pdf"></iframe>
       <div id="pdfExplanation" class="text-explanation">Texto explicativo para el PDF 1.</div>
     </div>
     <button class="btn-pdf" onclick="togglePDF()">Cambiar PDF</button>
+
+    <div id="graficas" style="margin-top: 40px;">
+      <iframe src="https://www.geogebra.org/calculator/vfezspxw" 
+              width="800" height="600" style="border: 1px solid #e4e4e4;border-radius: 4px;" frameborder="0" allowfullscreen></iframe>
+      <div class="manipulable-text">🔧 Este apartado es manipulable, puedes moverla a tu gusto.</div>
+      <button class="btn-intentar" onclick="mostrarEncuesta()">Prueba tu intelecto</button>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Grupo 4 - Ecuaciones Diferenciales
+  </footer>
+
+  <div class="popup" id="popup">
+    <h2>🎮 Cómo se juega:</h2>
+    <p>1. Se te da una población proyectada.<br>
+       2. Debes adivinar el año (entre 2010 y 2070) en que se alcanza esa población.<br>
+       3. Cada intento te dirá cuántos dígitos están correctos y en su lugar (fijas), y cuántos están en el año pero en otra posición (picas).<br>
+       4. Pierdes una vida por intento fallido. Si el formato está mal, puedes perder más.<br>
+       5. Tienes 10 vidas. ¡Buena suerte! 🎉</p>
+    <button onclick="cerrarPopup()">Cerrar</button>
+  </div>
+
+  <div class="survey" id="survey">
+    <h2>Encuesta de conocimiento:</h2>
+    <div id="preguntas"></div>
+    <button onclick="evaluarEncuesta()">Enviar respuestas</button>
+    <button onclick="cerrarEncuesta()">Cerrar</button>
   </div>
 
   <script>
     let currentPDF = 1;
-
-    function togglePDF() {
-      const pdfViewer = document.getElementById("pdfViewer");
-      const pdfExplanation = document.getElementById("pdfExplanation");
-      if (currentPDF === 1) {
-        pdfViewer.src = "ProyectoED_corte2of.pdf";
-        pdfExplanation.textContent = "Texto explicativo para el PDF 2.";
-        currentPDF = 2;
-      } else {
-        pdfViewer.src = "proyecto ecuaciones corte 1.pdf";
-        pdfExplanation.textContent = "Texto explicativo para el PDF 1.";
-        currentPDF = 1;
-      }
-    }
+    let añoSecreto, tSecreto, poblacionSecreta, vidas, intentos, historial, pistaDada, juegoTerminado;
+    const preguntas = ["Pregunta 1", "Pregunta 2", "Pregunta 3", "Pregunta 4", "Pregunta 5", "Pregunta 6", "Pregunta 7", "Pregunta 8", "Pregunta 9", "Pregunta 10"];
+    let respuestas = [];
 
     function poblacion(t) {
       return 2000000 / (3.0444 * Math.exp(-0.059 * t) + 1);
@@ -143,7 +256,6 @@
       let fijas = 0, picas = 0;
       let usadasSecreto = [false, false, false, false];
       let usadasIntento = [false, false, false, false];
-
       for (let i = 0; i < 4; i++) {
         if (intento[i] === secreto[i]) {
           fijas++;
@@ -151,7 +263,6 @@
           usadasIntento[i] = true;
         }
       }
-
       for (let i = 0; i < 4; i++) {
         if (!usadasIntento[i]) {
           for (let j = 0; j < 4; j++) {
@@ -166,20 +277,49 @@
       return [fijas, picas];
     }
 
-    let añoSecreto = Math.floor(Math.random() * (2070 - 2010 + 1)) + 2010;
-    let tSecreto = añoAT(añoSecreto);
-    let poblacionSecreta = Math.floor(poblacion(tSecreto));
-    let vidas = 10;
-    let intentos = 0;
-    let historial = [];
-    let pistaDada = false;
-    let juegoTerminado = false;
+    function togglePDF() {
+      const pdfViewer = document.getElementById("pdfViewer");
+      const pdfHeader = document.getElementById("pdfHeader");
+      const pdfExplanation = document.getElementById("pdfExplanation");
+      if (currentPDF === 1) {
+        pdfViewer.src = "ProyectoED_corte2of.pdf";
+        pdfHeader.textContent = "Proyecto ecuaciones diferenciales - Parte 2";
+        pdfExplanation.textContent = "Texto explicativo para el PDF 2.";
+        currentPDF = 2;
+      } else {
+        pdfViewer.src = "proyecto ecuaciones corte 1.pdf";
+        pdfHeader.textContent = "Proyecto ecuaciones diferenciales - Parte 1";
+        pdfExplanation.textContent = "Texto explicativo para el PDF 1.";
+        currentPDF = 1;
+      }
+    }
 
-    document.getElementById("poblacion").textContent = `La población proyectada es: ${poblacionSecreta} habitantes`;
+    function mostrarExplicacion() {
+      document.getElementById("popup").style.display = "block";
+    }
+
+    function cerrarPopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+
+    function reiniciarJuego() {
+      añoSecreto = Math.floor(Math.random() * (2070 - 2010 + 1)) + 2010;
+      tSecreto = añoAT(añoSecreto);
+      poblacionSecreta = Math.floor(poblacion(tSecreto));
+      vidas = 10;
+      intentos = 0;
+      historial = [];
+      pistaDada = false;
+      juegoTerminado = false;
+      document.getElementById("poblacion").textContent = `La población proyectada es: ${poblacionSecreta} habitantes`;
+      document.getElementById("vidas").textContent = vidas;
+      document.getElementById("mensaje").textContent = "";
+      document.getElementById("historial").innerHTML = "";
+      document.getElementById("inputAño").value = "";
+    }
 
     function verificarIntento() {
       if (juegoTerminado) return;
-
       const input = document.getElementById("inputAño");
       const año = input.value.trim();
       const mensaje = document.getElementById("mensaje");
@@ -197,7 +337,6 @@
           intentos++;
           vidas--;
           historial.push({ intento: año, fijas, picas });
-
           const h = document.getElementById("historial");
           const entrada = document.createElement("div");
           entrada.textContent = `Intento ${intentos}: ${año} → 🔢 Fijas: ${fijas}, Picas: ${picas}`;
@@ -207,13 +346,11 @@
 
           if (fijas === 4) {
             juegoTerminado = true;
-            if (intentos === 1) {
-              mensaje.textContent += "\n🎉 ¡Eres un genio, tienes un IQ de 1000!";
-            } else if (intentos <= 5) {
-              mensaje.textContent += "\n🎉 ¡Felicidades crack! ¡Lo resolviste muy rápido!";
-            } else {
-              mensaje.textContent += `\n🎉 ¡Bien hecho! Adivinaste el año correctamente en ${intentos} intentos.`;
-            }
+            mensaje.textContent += intentos === 1
+              ? "\n🎉 ¡Eres un genio, tienes un IQ de 1000!"
+              : intentos <= 5
+                ? "\n🎉 ¡Felicidades crack! ¡Lo resolviste muy rápido!"
+                : `\n🎉 ¡Bien hecho! Adivinaste el año correctamente en ${intentos} intentos.`;
           } else if (vidas < 5 && !pistaDada) {
             for (let i = 0; i < 4; i++) {
               const digito = añoSecreto.toString()[i];
@@ -243,6 +380,55 @@
       document.getElementById("vidas").textContent = vidas;
       input.value = "";
     }
+
+    function mostrarEncuesta() {
+      const preguntasElegidas = [];
+      while (preguntasElegidas.length < 3) {
+        const randomIndex = Math.floor(Math.random() * preguntas.length);
+        if (!preguntasElegidas.includes(randomIndex)) {
+          preguntasElegidas.push(randomIndex);
+        }
+      }
+      const preguntasDiv = document.getElementById("preguntas");
+      preguntasDiv.innerHTML = ""; // Limpiar preguntas anteriores
+      preguntasElegidas.forEach(index => {
+        const pregunta = document.createElement("div");
+        pregunta.innerHTML = `<p>${preguntas[index]}</p>
+                             <input type="radio" name="respuesta${index}" value="1"> Correcta<br>
+                             <input type="radio" name="respuesta${index}" value="0"> Incorrecta<br>`;
+        preguntasDiv.appendChild(pregunta);
+      });
+      document.getElementById("survey").style.display = "block";
+    }
+
+    function evaluarEncuesta() {
+      let correctas = 0;
+      for (let i = 0; i < preguntas.length; i++) {
+        const respuesta = document.querySelector(`input[name="respuesta${i}"]:checked`);
+        if (respuesta) {
+          correctas += parseInt(respuesta.value);
+        }
+      }
+      let mensaje = "";
+      if (correctas === 3) {
+        mensaje = "¡Excelente!";
+      } else if (correctas === 2) {
+        mensaje = "Aún puedes mejorar, pero no estás mal.";
+      } else if (correctas === 1) {
+        mensaje = "Debes leer un poco más el documento.";
+      } else {
+        mensaje = "Me lastimaste, no leíste el documento.";
+      }
+      alert(mensaje);
+      cerrarEncuesta();
+    }
+
+    function cerrarEncuesta() {
+      document.getElementById("survey").style.display = "none"; // Ocultar encuesta
+    }
+
+    // Iniciar juego al cargar
+    reiniciarJuego();
   </script>
 </body>
 </html>
